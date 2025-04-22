@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        // 로그인된 상태에서 Register 클릭 시 확인 메시지 띄우기
+        function confirmLogoutAndRegister(event) {
+            event.preventDefault();  // 기본 동작(링크 이동) 방지
+            const isConfirmed = confirm('로그아웃 후 회원가입을 하시겠습니까?');
+            if (isConfirmed) {
+                // 로그아웃 후 회원가입으로 이동
+                window.location.href = '/logout';  // 로그아웃 처리 후 이동할 URL
+            }
+        }
+    </script>
+    <style>
+        .fixed-size {
+            width: 1903px;
+            height: 83px;
+            max-width: 100%; /* 화면이 작아지면 100%까지만 줄어듦 */
+            overflow: hidden; /* 내용이 넘칠 경우 숨김 */
+        }
+
+    </style>
+</head>
+<body>
+<!-- src/main/resources/templates/fragments/navbar.html -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top fixed-size">
+    <div class="container">
+        <a class="navbar-brand" href="/">Mingle</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+        <!--      <li class="nav-item"><a class="nav-link" href="/">홈</a></li>-->
+                <li class="nav-item"><a class="nav-link" href="/about">소개</a></li>
+                <li class="nav-item"><a class="nav-link" href="/restaurants/filter">레스토랑</a></li>
+                <li class="nav-item"><a class="nav-link" href="/accommodation/filter">숙소</a></li>
+              <li class="nav-item"><a class="nav-link" href="/contact">문의하기</a></li>
+                <li class="nav-item"><a class="nav-link" href="/reviews">리뷰 게시판</a></li>
+            </ul>
+
+
+
+            <!-- 로그인된 상태에서만 Logout 버튼 보이기 -->
+            <div class="d-flex" sec:authorize="isAuthenticated()">
+                <a href="/logout" class="btn btn-outline-primary me-2" onclick="return confirm('로그아웃 하시겠습니까?')">로그아웃</a>
+            </div>
+
+            <!-- 로그인되지 않은 상태에서 Login 버튼 보이기 -->
+            <div class="d-flex" sec:authorize="!isAuthenticated()">
+                <a href="/login" class="btn btn-outline-primary me-2">로그인</a>
+            </div>
+
+
+            <div class="d-flex" sec:authorize="hasRole('ROLE_USER')" >
+                <a href="/mypage/guest" class="btn btn-primary">마이페이지</a>
+            </div>
+            <div class="d-flex" sec:authorize="hasRole('ROLE_HOST')">
+                <a href="/mypage/host" class="btn btn-primary">관리자페이지</a>
+            </div>
+
+            <!-- 로그인되지 않은 상태에서만 Register 버튼 보이기 -->
+            <div class="d-flex" sec:authorize="!isAuthenticated()">
+                <a href="/guestOrHost" class="btn btn-primary" onclick="confirmLogoutAndRegister(event)">회원가입</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+</body>
+</html>

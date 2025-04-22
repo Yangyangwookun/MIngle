@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>우리 회사 블로그</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif, 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 400;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: nav}"></div>
+<br>
+<br>
+<br>
+<br>
+<div class="container">
+    <h2 class="my-4 text-center">우리 Mingle 블로그</h2>
+
+    <div class="row">
+        <div class="col-md-4" th:each="post : ${posts}">
+            <div class="card mb-4">
+                <img th:src="${post.image}" class="card-img-top" alt="블로그 이미지">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${post.title}">블로그 제목</h5>
+                    <p class="card-text" th:text="${post.summary}">블로그 요약...</p>
+                    <a th:href="@{/bottom/blog/post/{id}(id=${post.id})}" class="btn btn-primary">더 보기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

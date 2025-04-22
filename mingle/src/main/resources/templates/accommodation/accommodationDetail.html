@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예약하기</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/select.css">
+    <style>
+        :root {
+            --primary: #4285F4;
+            --text-dark: #222222;
+            --text-light: #717171;
+            --bg-light: #F8F9FA;
+            --border-color: #E8E9EC;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            color: var(--text-dark);
+            background-color: white;
+        }
+
+      /*  .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }*/
+
+        .image-gallery {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 8px;
+        }
+
+        .image-gallery img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .location {
+            color: var(--text-light);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .rating i {
+            color: #FFD700;
+            margin-right: 4px;
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .feature-badge {
+            background-color: #F5F5F5;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .price {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .reserve-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .reserve-btn:hover {
+            background-color: #3367d6;
+        }
+
+    </style>
+</head>
+<body>
+
+
+<!-- 네비게이션 바 포함 -->
+<div th:replace="~{fragments/navbar :: nav}"></div>
+<br>
+<br>
+<br>
+<br>
+<div th:if="${errorMessage != null}" class="alert alert-danger" role="alert">
+    <span th:text="${errorMessage}"></span>
+</div>
+
+
+<!-- 숙소 상세 컨테이너 -->
+<div class="container">
+<!--    &lt;!&ndash; 숙소 이미지 갤러리 &ndash;&gt;
+    <div class="image-gallery">
+        <img th:each="photo : ${accommodation.outterPhotos}" th:src="${photo.image}" alt="숙소 이미지">
+    </div>-->
+
+    <!-- 숙소 기본 정보 -->
+    <h1 class="title" th:text="${accommodation.name}"></h1>
+    <p class="location">
+        <i class="fas fa-map-marker-alt"></i> <span th:text="${accommodation.location}"></span>
+    </p>
+
+    <!-- 평점 -->
+    <!--    <div class="rating">-->
+    <!--        <i class="fas fa-star"></i>-->
+    <!--        <span class="rating-value" th:text="${accommodation.rating}"></span>-->
+    <!--        <span class="rating-count" th:text="'(' + ${accommodation.reviewCount} + ')'"></span>-->
+    <!--    </div>-->
+
+    <!-- 편의시설 -->
+    <div class="features">
+        <span class="feature-badge" th:if="${accommodation.parkingAvailable}">
+            <i class="fas fa-parking"></i> 주차 가능
+        </span>
+        <span class="feature-badge" th:if="${accommodation.morningAvailable}">
+            <i class="fas fa-coffee"></i> 조식 제공
+        </span>
+        <span class="feature-badge">
+            <i class="fas fa-wifi"></i> 와이파이
+        </span>
+    </div>
+
+    <!-- 체크인/체크아웃 시간 -->
+    <div class="accommodation-times">
+        <p>체크인: <span th:text="${accommodation.checkInTime != null ? accommodation.checkInTime.format(T(java.time.format.DateTimeFormatter).ofPattern('HH:mm')) : '15:00'}"></span></p>
+        <p>체크아웃: <span th:text="${accommodation.checkOutTime != null ? accommodation.checkOutTime.format(T(java.time.format.DateTimeFormatter).ofPattern('HH:mm')) : '11:00'}">11:00</span></p>
+    </div>
+
+    <!-- ✅ 객실 선택 및 정보 표시 -->
+    <div class="room-list">
+
+        <h2>객실 정보</h2>
+        <div class="room-container">
+            <div th:each="room : ${roomList}" class="room-item"
+                 th:data-room-id="${room.id}" th:data-room-cost="${room.cost}"
+                 onclick="selectRoom(this)">
+                <div class="room-photos">
+                    <!-- ✅ 해당 객실의 사진이 있는 경우 표시 -->
+                    <img th:if="${roomPhotosMap[room.id] != null}"
+                         th:src="@{${roomPhotosMap[room.id]}}"
+                         alt="객실 사진"
+                         class="room-photo">
+                </div>
+                <div class="room-name">
+                    <strong th:text="${room.name}">객실 이름</strong>
+                </div>
+                <div class="room-cost">
+                    가격: ₩<span th:text="${room.cost}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ 예약 정보 입력 폼 -->
+    <form action="/reservation/accommodation" method="post">
+        <input type="hidden" id="selectedRoomId" name="roomId">
+        <input type="hidden" id="selectedRoomCost" name="roomCost">
+        <input type="hidden" th:value="${accommodation.checkInTime}" id="checkinTime" name="checkinTime">
+
+        <div class="reservation-info">
+            <label for="checkin-date">체크인 날짜:</label>
+            <input type="date" id="checkin-date" name="checkinDate" required>
+
+            <label for="stay-days">숙박 기간 (박):</label>
+            <input type="number" id="stay-days" name="stayDays" min="1" required>
+        </div>
+
+        <button type="submit" class="reserve-btn" disabled>예약하기</button>
+    </form>
+    <!--    &lt;!&ndash; ✅ 방 정보 표시 &ndash;&gt;-->
+    <!--    <div class="room-list">-->
+    <!--        <h2>객실 정보</h2>-->
+    <!--        <div th:each="room : ${rooms}" class="room-item">-->
+    <!--            <div class="room-name">-->
+    <!--                <strong th:text="${room.name}">객실 이름</strong>-->
+    <!--            </div>-->
+    <!--            <div class="room-cost">-->
+    <!--                가격: ₩<span th:text="${room.cost}"></span>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+
+    <!--    &lt;!&ndash; 예약 버튼 &ndash;&gt;-->
+    <!--    <a href="#" class="reserve-btn">예약하기</a>-->
+    <!-- 오류 메시지를 출력할 위치 -->
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var prevPage = "[[${session.prevPage}]]"; // Thymeleaf에서 이전 페이지 가져오기
+        console.log("뒤로가기 감지됨, 이전 페이지:", prevPage); // 디버깅 로그
+
+        // 🔹 브라우저 뒤로가기 버튼 감지
+        window.addEventListener("popstate", function(event) {
+            if (prevPage && prevPage !== "null" && prevPage.includes("/accommodation/filterList")) {
+                window.location.href = prevPage;  // 🔹 저장된 이전 페이지로 이동
+            } else {
+                window.location.href = "/accommodation/filterList";  // 기본적으로 검색 페이지로 이동
+            }
+        });
+
+        // 🔹 현재 페이지를 히스토리에 추가 (뒤로가기 감지를 위해 필요)
+        history.pushState(null, null, location.href);
+    });
+
+    let selectedRoom = null;
+
+    function selectRoom(element) {
+        // 이미 선택된 방이 있으면 선택 해제
+        if (selectedRoom) {
+            selectedRoom.classList.remove('selected');
+        }
+
+        // 새로 선택된 방에 선택 상태 적용
+        selectedRoom = element;
+        element.classList.add('selected');
+
+        // 히든 필드에 값 저장
+        document.getElementById('selectedRoomId').value = element.getAttribute('data-room-id');
+        document.getElementById('selectedRoomCost').value = element.getAttribute('data-room-cost');
+
+        // 예약 버튼 활성화 여부 확인
+        validateReservationForm();
+    }
+
+    function validateReservationForm() {
+        const roomId = document.getElementById('selectedRoomId').value;
+        const checkinDate = document.getElementById('checkin-date').value;
+        const stayDays = document.getElementById('stay-days').value;
+
+        if (roomId && checkinDate && stayDays > 0) {
+            document.querySelector('.reserve-btn').disabled = false;
+        } else {
+            document.querySelector('.reserve-btn').disabled = true;
+        }
+    }
+
+    // 입력 필드 값이 바뀔 때마다 예약 버튼 상태 업데이트
+    document.getElementById('checkin-date').addEventListener('input', validateReservationForm);
+    document.getElementById('stay-days').addEventListener('input', validateReservationForm);
+</script>
+</body>
+</html>
