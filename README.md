@@ -35,5 +35,14 @@ Spring Boot 기반의 백엔드와 Bootstrap 기반의 프론트엔드로, **팀
 
 ---
 
+
+### Flowchart
+
+![image](https://github.com/user-attachments/assets/969145a7-bc48-4d56-a1a4-39cc4d2ea1d1)
+
+
+---
+
+
 ### ERDCloude
 ![image](https://github.com/user-attachments/assets/641b03ef-92a2-403d-9d1a-8b442651cdc1)
